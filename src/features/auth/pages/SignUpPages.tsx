@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import CarouselImage from "../components/CarouselImage";
 import { signUpSchema, type SignUpValues } from "../utils/schema";
 import { useForm } from "react-hook-form";
-import { useSignUp } from "../hooks/signUp";
+import { useSignUp } from "../hooks/UseSignUp";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { AxiosError } from "axios";
