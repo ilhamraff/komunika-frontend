@@ -170,12 +170,12 @@ export default function SignInPages() {
                         Password
                       </label>
                     </div>
-                    <a
-                      href="forget-password.html"
+                    <Link
+                      to="/forgot-password"
                       className="hover:underline font-medium leading-[20px] text-heyhao-secondary text-end"
                     >
                       Forget My password
-                    </a>
+                    </Link>
                   </div>
                   {errors?.password && (
                     <p className="mt-2 text-sm text-red-500">

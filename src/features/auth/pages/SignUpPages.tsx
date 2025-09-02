@@ -2,10 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import CarouselImage from "../components/CarouselImage";
 import { signUpSchema, type SignUpValues } from "../utils/schema";
 import { useForm } from "react-hook-form";
-import { useSignUp } from "../hooks/UseSignUp";
+import { useSignUp } from "../hooks/useSignUp";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "../../../shared/utils/constant";
 import { AxiosError } from "axios";
+import { Link } from "react-router";
 
 export default function SignUpPages() {
   const {
@@ -277,12 +278,12 @@ export default function SignUpPages() {
               </button>
               <p className="font-semibold leading-[20px] text-center">
                 Already Have Account?{" "}
-                <a
-                  href="sign-in.html"
+                <Link
+                  to="/sign-in"
                   className="text-heyhao-blue hover:underline"
                 >
                   Login Now
-                </a>
+                </Link>
               </p>
             </section>
           </form>
