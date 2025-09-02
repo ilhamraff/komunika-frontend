@@ -1,9 +1,17 @@
 import GroupCard from "../components/GroupCard";
 import { useSearchParams } from "react-router";
+import { useDiscoverGroups } from "../hooks/useDiscoverGroups";
+import { useState } from "react";
+import SearchForm from "../components/SearchForm";
 
 export default function DiscoverPage() {
+  const [tab, setTab] = useState<"GROUP" | "PEOPLE">("GROUP");
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
+
+  const groups = useDiscoverGroups(tab === "GROUP", query ?? "");
+
+  console.log(groups.data);
 
   return (
     <main
@@ -25,28 +33,7 @@ export default function DiscoverPage() {
           alt="ornament"
         />
         <div className="flex items-center justify-between relative z-30">
-          <form action="discover-result.html" className="relative group">
-            <button
-              type="submit"
-              className="shrink-0 absolute left-4 top-1/2 -translate-y-1/2"
-            >
-              <img
-                src="/assets/images/icons/search-normal.svg"
-                className="hidden size-6 shrink-0 group-has-[:placeholder-shown]:flex"
-                alt="icon"
-              />
-              <img
-                src="/assets/images/icons/search-normal-black.svg"
-                className="flex size-6 shrink-0 group-has-[:placeholder-shown]:hidden"
-                alt="icon"
-              />
-            </button>
-            <input
-              type="text"
-              className="bg-white w-[545px] h-[56px] rounded-2xl pl-[48px] border border-heyhao-border placeholder:font-semibold placeholder:text-base placeholder:leading-[20px] placeholder:text-heyhao-secondary font-semibold text-base leading-[20px] text-heyhao-black outline-none focus:border-heyhao-blue transition-all duration-300 pr-4"
-              placeholder="Discover your group. Build your network."
-            />
-          </form>
+          <SearchForm />
           <ul className="flex items-center gap-4">
             <li className="group">
               <a href="">
@@ -184,9 +171,19 @@ export default function DiscoverPage() {
             Featured Groups
           </h2>
           <div id="Cards-Item" className="grid grid-cols-3 gap-4">
-            <GroupCard />
-            <GroupCard />
-            <GroupCard />
+            {groups.data?.map((item) => (
+              <GroupCard
+                key={item.id}
+                data={{
+                  name: item.name,
+                  about: item.about,
+                  id: item.id,
+                  photo: item.photo_url,
+                  totalMembers: item.room._count.RoomMember,
+                  type: item.type,
+                }}
+              />
+            ))}
           </div>
         </section>
         <section id="Pagination" className="mx-auto">

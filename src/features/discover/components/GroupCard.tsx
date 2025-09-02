@@ -1,4 +1,19 @@
-export default function GroupCard() {
+import { Link } from "react-router";
+
+interface CardProps {
+  id: string;
+  name: string;
+  photo: string;
+  totalMembers: number;
+  type: string;
+  about: string;
+}
+
+type GroupCardProps = {
+  data: CardProps;
+};
+
+export default function GroupCard({ data }: GroupCardProps) {
   return (
     <div className="card group vip rounded-3xl border border-heyhao-border relative overflow-hidden p-6 flex flex-col gap-4">
       <img
@@ -8,26 +23,24 @@ export default function GroupCard() {
       />
       <div className="flex items-center justify-between relative z-10">
         <div className="flex justify-center items-center rounded-full overflow-hidden size-[64px] shrink-0">
-          <img
-            src="/assets/images/thumbnails/featured-1.png"
-            alt="icon"
-            className="size-full object-cover"
-          />
+          <img src={data.photo} alt="icon" className="size-full object-cover" />
         </div>
-        <div className="hidden group-[&.vip]:flex items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full">
-          <img
-            src="/assets/images/icons/crown-blue-fill.svg"
-            alt="icon"
-            className="size-4 shrink-0"
-          />
-          <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
-            VIP
-          </p>
-        </div>
+        {data.type === "PAID" && (
+          <div className="hidden group-[&.vip]:flex items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full">
+            <img
+              src="/assets/images/icons/crown-blue-fill.svg"
+              alt="icon"
+              className="size-4 shrink-0"
+            />
+            <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
+              VIP
+            </p>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-1 relative z-10">
         <h3 className="line-clamp-1 font-semibold text-lg leading-[22.5px]">
-          Figma Wizards: From Zero To Magic
+          {data.name}
         </h3>
         <div className="flex items-center gap-1">
           <img
@@ -37,7 +50,7 @@ export default function GroupCard() {
           />
           <div className="flex gap-1">
             <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
-              22.259
+              {data.totalMembers}
             </p>
             <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
               Members
@@ -46,10 +59,9 @@ export default function GroupCard() {
         </div>
       </div>
       <p className="relative z-10 font-medium text-sm leading-[25.2px] text-heyhao-secondary line-clamp-2">
-        Buat yang suka belajar UI Design, yuk ubah desainmu menjadi desain kece
-        😉
+        {data.about}
       </p>
-      <a href="group-profile-vip.html" className="relative z-10">
+      <Link to={`/home/discover/group/${data.id}`} className="relative z-10">
         <div className="flex items-center gap-[2px]">
           <p className="font-semibold text-sm leading-[17.5px] text-heyhao-blue hover:underline">
             View Group Details
@@ -60,7 +72,7 @@ export default function GroupCard() {
             className="size-[12px] shrink-0"
           />
         </div>
-      </a>
+      </Link>
     </div>
   );
 }
