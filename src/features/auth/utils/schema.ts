@@ -18,6 +18,16 @@ export const forgotPasswordSchema = signUpSchema.pick({
   email: true,
 });
 
+export const updatePasswordSchema = z
+  .object({
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password do not match",
+  });
+
 export type SignUpValues = z.infer<typeof signUpSchema>;
 export type SignInValues = z.infer<typeof signInSchema>;
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+export type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>;
