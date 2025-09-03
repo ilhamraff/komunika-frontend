@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
 
 export default function LayoutPage() {
   return (
@@ -7,13 +7,13 @@ export default function LayoutPage() {
         <nav className="flex flex-col h-full justify-between items-center w-[84px] shrink-0 py-[30px] px-5 bg-heyhao-grey">
           <ul className="flex flex-col gap-5">
             <li>
-              <a href="#">
+              <Link to="/home/discover">
                 <img
                   src="/assets/images/logos/logo-icon.svg"
                   className="flex w-11 h-9 shrink-0"
                   alt="logo"
                 />
-              </a>
+              </Link>
             </li>
             <li className="group">
               <a

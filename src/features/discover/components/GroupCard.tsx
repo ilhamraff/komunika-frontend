@@ -25,7 +25,7 @@ export default function GroupCard({ data }: GroupCardProps) {
         <div className="flex justify-center items-center rounded-full overflow-hidden size-[64px] shrink-0">
           <img src={data.photo} alt="icon" className="size-full object-cover" />
         </div>
-        {data.type === "PAID" && (
+        {data.type === "PAID" ? (
           <div className="hidden group-[&.vip]:flex items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full">
             <img
               src="/assets/images/icons/crown-blue-fill.svg"
@@ -34,6 +34,12 @@ export default function GroupCard({ data }: GroupCardProps) {
             />
             <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
               VIP
+            </p>
+          </div>
+        ) : (
+          <div className="hidden group-[&.vip]:flex items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full">
+            <p className="font-bold text-sm leading-[17.5px] text-heyhao-green">
+              FREE
             </p>
           </div>
         )}

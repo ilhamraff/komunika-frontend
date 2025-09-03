@@ -8,6 +8,7 @@ import LayoutPage from "./shared/components/LayoutPage";
 import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
+import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "discover",
         element: <DiscoverPage />,
+      },
+      {
+        path: "discover/group/:groupId",
+        element: <DetailGroupPage />,
       },
     ],
   },
