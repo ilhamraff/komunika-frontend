@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router";
 import { useDiscoverGroups } from "../hooks/useDiscoverGroups";
 import { useState } from "react";
 import SearchForm from "../components/SearchForm";
+import PeopleCard from "../components/PeopleCard";
+import { useDiscoverPeoples } from "../hooks/useDiscoverPeoples";
 
 export default function DiscoverPage() {
   const [tab, setTab] = useState<"GROUP" | "PEOPLE">("GROUP");
@@ -10,6 +12,7 @@ export default function DiscoverPage() {
   const query = searchParams.get("search");
 
   const groups = useDiscoverGroups(tab === "GROUP", query ?? "");
+  const peoples = useDiscoverPeoples(tab === "PEOPLE", query ?? "");
 
   console.log(groups.data);
 
@@ -132,13 +135,23 @@ export default function DiscoverPage() {
             >
               <button
                 type="button"
-                className="px-[26.5px] py-[14px] rounded-xl bg-heyhao-blue font-medium hover:bg-heyhao-blue hover:text-white text-white leading-[20px] transition-all duration-300"
+                onClick={() => setTab("GROUP")}
+                className={`leading-[20px] transition-all duration-300 px-[26.5px] py-[14px] rounded-xl ${
+                  tab === "GROUP"
+                    ? "bg-heyhao-blue font-medium hover:bg-heyhao-blue hover:text-white text-white"
+                    : "hover:bg-heyhao-blue bg-white font-medium hover:text-white text-heyhao-secondary"
+                }`}
               >
                 Groups
               </button>
               <button
                 type="button"
-                className="px-[26.5px] py-[14px] rounded-xl hover:bg-heyhao-blue bg-white font-medium hover:text-white text-heyhao-secondary leading-[20px] transition-all duration-300"
+                onClick={() => setTab("PEOPLE")}
+                className={`leading-[20px] transition-all duration-300 px-[26.5px] py-[14px] rounded-xl ${
+                  tab === "PEOPLE"
+                    ? "bg-heyhao-blue font-medium hover:bg-heyhao-blue hover:text-white text-white"
+                    : "hover:bg-heyhao-blue bg-white font-medium hover:text-white text-heyhao-secondary"
+                }`}
               >
                 People
               </button>
@@ -166,26 +179,50 @@ export default function DiscoverPage() {
         )}
       </section>
       <div className="w-full flex flex-col gap-[30px] p-[30px]">
-        <section id="Featured-Groups" className="flex flex-col gap-[12px]">
-          <h2 className="font-semibold text-xl leading-[25px]">
-            Featured Groups
-          </h2>
-          <div id="Cards-Item" className="grid grid-cols-3 gap-4">
-            {groups.data?.map((item) => (
-              <GroupCard
-                key={item.id}
-                data={{
-                  name: item.name,
-                  about: item.about,
-                  id: item.id,
-                  photo: item.photo_url,
-                  totalMembers: item.room._count.RoomMember,
-                  type: item.type,
-                }}
-              />
-            ))}
-          </div>
-        </section>
+        {tab === "GROUP" && (
+          <section id="Featured-Groups" className="flex flex-col gap-[12px]">
+            <h2 className="font-semibold text-xl leading-[25px]">
+              Featured Groups
+            </h2>
+            <div id="Cards-Item" className="grid grid-cols-3 gap-4">
+              {groups.data?.map((item) => (
+                <GroupCard
+                  key={item.id}
+                  data={{
+                    name: item.name,
+                    about: item.about,
+                    id: item.id,
+                    photo: item.photo_url,
+                    totalMembers: item.room._count.RoomMember,
+                    type: item.type,
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+        {tab === "PEOPLE" && (
+          <section id="ContainerPeople" className="w-full p-[30px]">
+            <div id="Result-People" className="flex flex-col gap-4">
+              <h2 className="font-semibold text-xl leading-[25px]">
+                Features Peoples
+              </h2>
+              <div id="People-Item" className="grid grid-cols-2 gap-4">
+                {peoples.data?.map((item) => (
+                  <PeopleCard
+                    key={item.id}
+                    data={{
+                      id: item.id,
+                      createdAt: item.createdAt,
+                      name: item.name,
+                      photo: item.photo_url,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
         <section id="Pagination" className="mx-auto">
           <ul className="flex items-center gap-4">
             <div id="Step-Before" className="group nonactive shrink-0">

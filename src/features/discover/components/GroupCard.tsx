@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-interface CardProps {
+interface Group {
   id: string;
   name: string;
   photo: string;
@@ -10,7 +10,7 @@ interface CardProps {
 }
 
 type GroupCardProps = {
-  data: CardProps;
+  data: Group;
 };
 
 export default function GroupCard({ data }: GroupCardProps) {
