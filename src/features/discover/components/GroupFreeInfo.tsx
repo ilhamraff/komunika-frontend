@@ -1,10 +1,40 @@
-// import type { DetailGroupValues } from "../api/getDetailGroup";
+import type { DetailGroupValues } from "../api/getDetailGroup";
 
-// interface GroupFreeInfoProps {
-//   data: DetailGroupValues | undefined;
-// }
+import { useNavigate } from "react-router";
+import { useJoinGroup } from "../hooks/useJoinGroup";
+import { AxiosError } from "axios";
 
-export default function GroupFreeInfo() {
+interface GroupFreeInfoProps {
+  data: DetailGroupValues | undefined;
+}
+
+export default function GroupFreeInfo({ data }: GroupFreeInfoProps) {
+  const { mutateAsync, isPending } = useJoinGroup();
+
+  const navigate = useNavigate();
+
+  const onJoinGroup = async () => {
+    try {
+      if (!data) {
+        alert("Group not found");
+
+        return;
+      }
+
+      await mutateAsync({ groupId: data?.id });
+
+      navigate("/home/chats");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(error?.response?.data?.message ?? "An error occured");
+      }
+
+      const err = error as Error;
+
+      alert(err?.message ?? "An error occured");
+    }
+  };
+
   return (
     <form>
       <div className="p-6 rounded-3xl bg-white flex flex-col gap-6">
@@ -67,10 +97,12 @@ export default function GroupFreeInfo() {
           </div>
         </section>
         <button
-          type="submit"
+          type="button"
+          disabled={isPending}
+          onClick={onJoinGroup}
           className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center"
         >
-          Join For Free
+          {isPending ? "Loading..." : "Join For Free"}
         </button>
         <a href="message-room-chat-people.html">
           <div className="rounded-full bg-heyhao-blue flex items-center justify-center gap-[10px] py-4 text-white w-full font-bold leading-[20px] text-center">

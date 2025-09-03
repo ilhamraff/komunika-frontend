@@ -9,6 +9,7 @@ import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
+import SuccessPaymentPage from "./features/transactions/pages/SuccessPaymentPage";
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       return true;
     },
     element: <UpdatePasswordPage />,
+  },
+  {
+    path: "/success-payment",
+    element: <SuccessPaymentPage />,
   },
   {
     path: "/home",

@@ -1,13 +1,38 @@
+import { AxiosError } from "axios";
 import { formatRupiah } from "../../../shared/utils/helper";
 import type { DetailGroupValues } from "../api/getDetailGroup";
+import { useJoinPaidGroup } from "../hooks/useJoinPaidGroup";
+import { Link } from "react-router";
 
 interface GroupPaidInfoProps {
   data: DetailGroupValues | undefined;
 }
 
 export default function GroupPaidInfo({ data }: GroupPaidInfoProps) {
+  const { mutateAsync, isPending } = useJoinPaidGroup();
+
+  const onJoinGroup = async () => {
+    try {
+      if (!data) {
+        return alert("Group not found");
+      }
+
+      const response = await mutateAsync({ groupId: data.id });
+
+      window.location.replace(response.data.redirect_url);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(error?.response?.data?.message ?? "An error occured");
+      }
+
+      const err = error as Error;
+
+      alert(err?.message ?? "An error occured");
+    }
+  };
+
   return (
-    <form action="group-profile-payment-success.html">
+    <form>
       <div className="p-6 rounded-3xl bg-white flex flex-col gap-6">
         <section id="Benefit-Group" className="flex flex-col gap-[12px]">
           <h2 className="font-semibold leading-5">Benefit Group</h2>
@@ -50,13 +75,15 @@ export default function GroupPaidInfo({ data }: GroupPaidInfoProps) {
           </div>
         </section>
         <button
-          type="submit"
-          className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center"
+          type="button"
+          disabled={isPending}
+          onClick={onJoinGroup}
+          className="rounded-full bg-heyhao-blue py-4 text-white w-full font-bold leading-[20px] text-center cursor-pointer"
         >
-          Pay With Midtrains & Join
+          {isPending ? "Loading..." : "Pay With Midtrains & Join"}
         </button>
-        <a href="message-room-chat-people.html">
-          <div className="rounded-full bg-heyhao-blue flex items-center justify-center gap-[10px] py-4 text-white w-full font-bold leading-[20px] text-center">
+        <Link to="/home/chats">
+          <div className="rounded-full bg-heyhao-blue flex items-center justify-center gap-[10px] py-4 text-white w-full font-bold leading-[20px] text-center cursor-pointer">
             <img
               src="/assets/images/icons/messages-white-fill.svg"
               alt="icon"
@@ -64,7 +91,7 @@ export default function GroupPaidInfo({ data }: GroupPaidInfoProps) {
             />
             <p>Message</p>
           </div>
-        </a>
+        </Link>
       </div>
     </form>
   );

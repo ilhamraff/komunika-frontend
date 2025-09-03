@@ -9,6 +9,22 @@ export default function DetailGroupPage() {
 
   const { data, isLoading } = useDetailGroup(groupId ?? "");
 
+  if (isLoading) {
+    return (
+      <main className="flex items-center justify-center min-h-screen bg-white">
+        <p className="text-heyhao-blue font-semibold">Loading...</p>
+      </main>
+    );
+  }
+
+  if (!data) {
+    return (
+      <main className="flex items-center justify-center min-h-screen bg-white">
+        <p className="text-red-500 font-semibold">Group not found.</p>
+      </main>
+    );
+  }
+
   return (
     <main
       id="Main-Content-Container"
@@ -282,7 +298,7 @@ export default function DetailGroupPage() {
             {data?.type === "PAID" ? (
               <GroupPaidInfo data={data} />
             ) : (
-              <GroupFreeInfo />
+              <GroupFreeInfo data={data} />
             )}
           </div>
         </div>

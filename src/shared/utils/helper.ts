@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export const formatDate = (date: Date | string, format = "DD MM YYYY") => {
+export const formatDate = (date: Date | string, format = "DD MMM YYYY") => {
   return dayjs(date).format(format);
 };
 
