@@ -1,9 +1,62 @@
 import { Link } from "react-router";
-import Siderbar from "../../../shared/components/SiderBar";
+import Siderbar from "../../../shared/components/Siderbar";
 import SearchModal from "../components/SearchModal";
 import EmptyActiveRoom from "../components/EmptyActiveRoom";
+import { useGetRooms } from "../hooks/useGetRooms";
+import { useCallback, useState } from "react";
+import type { RoomsResponseValues } from "../api/getRooms";
+import secureLocalStorage from "react-secure-storage";
+import type { SignUpResponse } from "../../auth/api/signUp";
+import dayjs from "dayjs";
+import { formatDate } from "../../../shared/utils/helper";
+import RoomMessages from "../components/RoomMessages";
 
 export default function ChatPage() {
+  const auth = secureLocalStorage.getItem("AUTH_KEY") as SignUpResponse;
+
+  const [roomId, setRoomId] = useState<string | null>(null);
+
+  const { rooms } = useGetRooms();
+
+  const getProfile = useCallback(
+    (chat: RoomsResponseValues) => {
+      if (chat.isGroup) {
+        return {
+          name: chat.Group?.name,
+          photo: chat.Group?.photo_url,
+          messages:
+            chat.RoomMessage.length > 0
+              ? {
+                  content: chat.RoomMessage[0].content,
+                  createdAt: chat.RoomMessage[0].createdAt,
+                  type: chat.RoomMessage[0].type,
+                  sender: chat.RoomMessage[0].user.name,
+                }
+              : null,
+        };
+      }
+
+      const profileMember = chat.RoomMember.find(
+        (member) => member.user.id !== auth.id
+      );
+
+      return {
+        name: profileMember?.user.name,
+        photo: profileMember?.user.photo_url,
+        messages:
+          chat.RoomMessage.length > 0
+            ? {
+                content: chat.RoomMessage[0].content,
+                createdAt: chat.RoomMessage[0].createdAt,
+                type: chat.RoomMessage[0].type,
+                sender: chat.RoomMessage[0].user.name,
+              }
+            : null,
+      };
+    },
+    [auth.id]
+  );
+
   return (
     <>
       <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
@@ -125,44 +178,70 @@ export default function ChatPage() {
                       className="flex h-full w-full overflow-y-scroll hide-scrollbar"
                     >
                       <div className="flex flex-col w-full gap-1">
-                        <Link
-                          to="message-room-chat-people.html"
-                          className="chats-card group last:pb-8"
-                        >
-                          <div className="flex items-center rounded-2xl p-4 gap-3 group-[.active]:bg-heyhao-card-grey hover:bg-heyhao-card-grey transition-all duration-300">
-                            <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden border border-heyhao-border">
-                              <img
-                                src="/assets/images/photos/photo-1.png"
-                                className="w-full h-full object-cover"
-                                alt="photo"
-                              />
-                            </div>
-                            <div className="flex flex-col w-full gap-1">
-                              <div className="flex items-center justify-between gap-[6px]">
-                                <p className="font-medium leading-5 max-w-[182px] truncate">
-                                  Masayoshi
-                                </p>
-                                <span className="text-xs text-heyhao-secondary">
-                                  Now
-                                </span>
+                        {rooms?.map((room) => (
+                          <button
+                            key={room.id}
+                            type="button"
+                            onClick={() => setRoomId(room.id)}
+                            className="chats-card group last:pb-8"
+                          >
+                            <div className="flex items-center rounded-2xl p-4 gap-3 group-[.active]:bg-heyhao-card-grey hover:bg-heyhao-card-grey transition-all duration-300">
+                              <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden border border-heyhao-border">
+                                <img
+                                  src={getProfile(room).photo}
+                                  className="w-full h-full object-cover"
+                                  alt="photo"
+                                />
                               </div>
-                              <div className="flex items-center gap-1 justify-between">
-                                <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
-                                  <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:!hidden">
-                                    <span className="truncate">
-                                      {" "}
-                                      Sama-sama bro, thanks juga udah join{" "}
+                              <div className="flex flex-col w-full gap-1">
+                                <div className="flex items-center justify-between gap-[6px]">
+                                  <p className="font-medium leading-5 max-w-[182px] truncate">
+                                    {getProfile(room).name}
+                                  </p>
+                                  {room.RoomMessage.length > 0 && (
+                                    <span className="text-xs text-heyhao-secondary">
+                                      {dayjs().isSame(
+                                        getProfile(room).messages?.createdAt,
+                                        "date"
+                                      )
+                                        ? "Now"
+                                        : formatDate(
+                                            getProfile(room).messages
+                                              ?.createdAt ?? new Date(),
+                                            "D MMM"
+                                          )}
                                     </span>
-                                  </p>
-                                  <p className="hidden group-[.typing]:!flex text-heyhao-blue truncate">
-                                    Maiden is typing...
-                                  </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1 justify-between">
+                                  <div className="w-full max-w-[178px] text-sm text-heyhao-secondary line-clamp-1 mt-1">
+                                    <p className="flex items-center gap-1 text-heyhao-secondary group-[.new]:text-heyhao-black group-[.typing]:!hidden">
+                                      {room.RoomMessage.length > 0 && (
+                                        <span className="truncate">
+                                          {" "}
+                                          {room.isGroup
+                                            ? `${
+                                                getProfile(room).messages
+                                                  ?.sender
+                                              }: ${
+                                                getProfile(room).messages
+                                                  ?.content
+                                              }`
+                                            : getProfile(room).messages
+                                                ?.content}{" "}
+                                        </span>
+                                      )}
+                                    </p>
+                                    <p className="hidden group-[.typing]:!flex text-heyhao-blue truncate">
+                                      Maiden is typing...
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </Link>
-                        <Link
+                          </button>
+                        ))}
+                        {/* <Link
                           to="message-room-chat-group.html"
                           className="chats-card group last:pb-8"
                         >
@@ -199,7 +278,7 @@ export default function ChatPage() {
                               </div>
                             </div>
                           </div>
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -208,7 +287,11 @@ export default function ChatPage() {
             </div>
           </div>
         </aside>
-        <EmptyActiveRoom />
+        {roomId === null ? (
+          <EmptyActiveRoom />
+        ) : (
+          <RoomMessages roomId={roomId} />
+        )}
       </div>
       <SearchModal />
     </>

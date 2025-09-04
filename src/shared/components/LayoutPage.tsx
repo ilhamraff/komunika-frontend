@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import Siderbar from "./SiderBar";
+import Siderbar from "./Siderbar";
 
 export default function LayoutPage() {
   return (
