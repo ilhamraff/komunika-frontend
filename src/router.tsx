@@ -10,6 +10,7 @@ import secureLocalStorage from "react-secure-storage";
 import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPaymentPage from "./features/transactions/pages/SuccessPaymentPage";
+import ChatPage from "./features/chat/pages/ChatPage";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,19 @@ const router = createBrowserRouter([
   {
     path: "/success-payment",
     element: <SuccessPaymentPage />,
+  },
+  {
+    path: "/home/chats",
+    loader: () => {
+      const auth = secureLocalStorage.getItem(AUTH_KEY);
+
+      if (!auth) {
+        throw redirect("/sign-in");
+      }
+
+      return auth;
+    },
+    element: <ChatPage />,
   },
   {
     path: "/home",
