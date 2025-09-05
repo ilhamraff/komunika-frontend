@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useGetRoom } from "../hooks/useGetRoom";
 import type { MessageValues } from "../api/getRoom";
 import dayjs from "dayjs";
 import { formatDate } from "../../../shared/utils/helper";
 import secureLocalStorage from "react-secure-storage";
 import type { SignUpResponse } from "../../auth/api/signUp";
+import RoomMessagesForm from "./RoomMessagesForm";
+import { pusher } from "../utils/pusher";
 
 type Props = {
   roomId: string;
@@ -12,18 +14,14 @@ type Props = {
 
 export default function RoomMessages({ roomId }: Props) {
   const { room } = useGetRoom(roomId);
+  const [messages, setMessages] = useState<MessageValues[]>(
+    room?.RoomMessage ?? []
+  );
 
   const auth = secureLocalStorage.getItem("AUTH_KEY") as SignUpResponse;
 
   const groupMessageByDate = useMemo(() => {
-    if (!room?.RoomMessage) return {};
-
-    const sorted = [...room.RoomMessage].sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-
-    return sorted.reduce<Record<string, MessageValues[]>>((acc, message) => {
+    return messages?.reduce<Record<string, MessageValues[]>>((acc, message) => {
       const date = `${
         dayjs().isSame(message.createdAt, "date") ? "Today, " : ""
       }${formatDate(message.createdAt, "DD MMM")}`;
@@ -31,13 +29,40 @@ export default function RoomMessages({ roomId }: Props) {
       if (!acc[date]) {
         acc[date] = [];
       }
+
       acc[date].push(message);
 
       return acc;
-    }, {});
+    }, {} as Record<string, MessageValues[]>);
+  }, [messages]);
+
+  useEffect(() => {
+    if (room?.RoomMessage) {
+      setMessages(room.RoomMessage);
+    }
   }, [room?.RoomMessage]);
 
-  console.log(groupMessageByDate);
+  useEffect(() => {
+    if (!room) {
+      return;
+    }
+
+    const channelName = `chat-room-${room.id}`;
+    const eventName = `chat-room-${room.id}-event`;
+
+    const channel = pusher.subscribe(channelName);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    channel.bind(eventName, (message: any) => {
+      console.log(message);
+      setMessages((prev) => [...prev, message]);
+    });
+
+    return () => {
+      pusher.unsubscribe(channelName);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.id]);
 
   return (
     <main id="Main-Content-Container" className="relative flex flex-1">
@@ -281,44 +306,7 @@ export default function RoomMessages({ roomId }: Props) {
               )
             )}
           </article>
-          <div className="relative flex w-full z-30">
-            <form className="fixed bottom-0 w-full max-w-[calc(100%-444px)] p-5 gap-[10px] z-20">
-              <div className="relative">
-                <div
-                  id="Chat-Input"
-                  contentEditable="true"
-                  spellCheck="false"
-                  className="appearance-none outline-none w-full min-h-[60px] max-h-[200px] h-fit rounded-2xl p-5 pl-4 pr-[112px] bg-white break-words font-medium leading-5 hide-scrollbar focus:ring-2 focus:ring-heyhao-blue transition-all duration-300 empty:text-heyhao-secondary empty:before:content-['Type_a_message...'] text-heyhao-black shadow-sm"
-                ></div>
-                <div className="absolute flex right-2 bottom-2 gap-2">
-                  <button
-                    type="button"
-                    id="Upload-Image"
-                    className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 ring-heyhao-border hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
-                  >
-                    <img
-                      src="/assets/images/icons/gallery-import.svg"
-                      className="size-6"
-                      alt="icon"
-                    />
-                  </button>
-                  <button type="submit" className="flex shrink-0 w-11">
-                    <img
-                      src="/assets/images/icons/Send-Button-blue-bg.svg"
-                      className="object-contain"
-                      alt="icon"
-                    />
-                  </button>
-                </div>
-              </div>
-            </form>
-            <input
-              type="file"
-              id="imageInput"
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
+          <RoomMessagesForm roomId={roomId} />
         </div>
       </div>
     </main>
