@@ -41,7 +41,9 @@ export default function SignUpPages() {
       window.location.replace("/home/chats");
     } catch (error) {
       if (error instanceof AxiosError) {
-        return alert(error?.response?.data?.message ?? "An error occured");
+        return alert(
+          error?.response?.data?.message ?? "An Axios error occured"
+        );
       }
 
       const err = error as Error;

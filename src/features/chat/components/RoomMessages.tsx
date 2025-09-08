@@ -9,6 +9,7 @@ import RoomMessagesForm from "./RoomMessagesForm";
 import { pusher } from "../utils/pusher";
 import GroupInfoModal from "./GroupInfoModal";
 import GalleryModal from "./GalleryModal";
+import PersonalInfoModal from "./PersonalInfoModal";
 
 type Props = {
   roomId: string;
@@ -20,6 +21,7 @@ export default function RoomMessages({ roomId }: Props) {
     room?.RoomMessage ?? []
   );
   const [infoGroupModal, setInfoGroupModal] = useState<boolean>(false);
+  const [infoPersonalModal, setInfoPersonalModal] = useState<boolean>(false);
   const [viewImage, setViewImage] = useState<string | null>(null);
 
   const auth = secureLocalStorage.getItem("AUTH_KEY") as SignUpResponse;
@@ -39,6 +41,11 @@ export default function RoomMessages({ roomId }: Props) {
       return acc;
     }, {} as Record<string, MessageValues[]>);
   }, [messages]);
+
+  const profileUser = useMemo(() => {
+    return room?.RoomMember.find((member) => member.user.id !== auth.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.RoomMember]);
 
   useEffect(() => {
     if (room?.RoomMessage) {
@@ -76,52 +83,71 @@ export default function RoomMessages({ roomId }: Props) {
             id="Chat-Navigation"
             className="flex items-center justify-between w-full border-b border-heyhao-border p-5 gap-3 bg-white"
           >
-            <div id="Group-Title" className="flex items-center flex-1 gap-3">
-              <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                <img
-                  src={room?.Group.photo_url}
-                  className="w-full h-full object-cover"
-                  alt="photo"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-[6px]">
-                  <h1 className="font-semibold text-lg leading-[23px]">
-                    {room?.Group.name}
-                  </h1>
-                  {room?.Group.type === "PAID" && (
-                    <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                      VIP
-                    </p>
-                  )}
+            {room?.isGroup ? (
+              <div id="Group-Title" className="flex items-center flex-1 gap-3">
+                <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
+                  <img
+                    src={room?.Group.photo_url}
+                    className="w-full h-full object-cover"
+                    alt="photo"
+                  />
                 </div>
-                <div className="flex items-center gap-[6px]">
-                  <div className="group-member-photos flex items-center w-fit">
-                    {room?.RoomMember.slice(0, 3).map((item, index) => (
-                      <div
-                        key={`member-${index + 1}`}
-                        className="relative flex size-6 shrink-0 rounded-full overflow-hidden -ml-[10px] first:ml-0 z-20"
-                      >
-                        <img
-                          src={item.user.photo_url}
-                          className="w-full h-full object-cover"
-                          alt="photo"
-                        />
-                      </div>
-                    ))}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-[6px]">
+                    <h1 className="font-semibold text-lg leading-[23px]">
+                      {room?.Group.name}
+                    </h1>
+                    {room?.Group.type === "PAID" && (
+                      <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
+                        VIP
+                      </p>
+                    )}
                   </div>
-                  <span className="font-semibold text-sm text-heyhao-secondary">
-                    {room?.Group.room._count.RoomMember} Members
-                  </span>
-                  {/* <span className="font-semibold text-sm text-heyhao-secondary">
+                  <div className="flex items-center gap-[6px]">
+                    <div className="group-member-photos flex items-center w-fit">
+                      {room?.RoomMember.slice(0, 3).map((item, index) => (
+                        <div
+                          key={`member-${index + 1}`}
+                          className="relative flex size-6 shrink-0 rounded-full overflow-hidden -ml-[10px] first:ml-0 z-20"
+                        >
+                          <img
+                            src={item.user.photo_url}
+                            className="w-full h-full object-cover"
+                            alt="photo"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <span className="font-semibold text-sm text-heyhao-secondary">
+                      {room?.Group.room._count.RoomMember} Members
+                    </span>
+                    {/* <span className="font-semibold text-sm text-heyhao-secondary">
                   •
                 </span>
                 <span className="font-semibold text-sm text-heyhao-green">
                   19.500 Online
                 </span> */}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div id="Group-Title" className="flex items-center flex-1 gap-3">
+                <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
+                  <img
+                    src={profileUser?.user.photo_url}
+                    className="w-full h-full object-cover"
+                    alt="photo"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-[6px]">
+                    <h1 className="font-semibold text-lg leading-[23px]">
+                      {profileUser?.user.name}
+                    </h1>
+                  </div>
+                </div>
+              </div>
+            )}
             <ul className="flex gap-3">
               <li className="group">
                 <a
@@ -150,7 +176,13 @@ export default function RoomMessages({ roomId }: Props) {
               <li className="group">
                 <button
                   id="Info"
-                  onClick={() => setInfoGroupModal(true)}
+                  onClick={() => {
+                    if (room?.isGroup) {
+                      setInfoGroupModal(true);
+                    } else {
+                      setInfoPersonalModal(true);
+                    }
+                  }}
                   className="size-11 flex shrink-0 bg-white rounded-xl p-[10px] items-center justify-center ring-1 ring-heyhao-border hover:ring-1 hover:ring-heyhao-blue transition-all duration-300"
                 >
                   <img
@@ -335,6 +367,12 @@ export default function RoomMessages({ roomId }: Props) {
       )}
       {viewImage !== null && (
         <GalleryModal onClose={() => setViewImage(null)} image={viewImage} />
+      )}
+      {infoPersonalModal && (
+        <PersonalInfoModal
+          userId={profileUser?.user.id ?? ""}
+          onClose={() => setInfoPersonalModal(false)}
+        />
       )}
     </>
   );

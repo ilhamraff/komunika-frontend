@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router";
 import { formatDate } from "../../../shared/utils/helper";
+import { useCreateRoom } from "../hooks/useCreateRoom";
+import { AxiosError } from "axios";
 
 type People = {
   id: string;
@@ -12,6 +15,26 @@ interface PeopleCardProps {
 }
 
 export default function PeopleCard({ data }: PeopleCardProps) {
+  const { mutateAsync, isPending } = useCreateRoom();
+
+  const navigate = useNavigate();
+
+  const handleCreateRoom = async () => {
+    try {
+      await mutateAsync({ userId: data.id });
+
+      navigate("/home/chats");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(
+          error?.response?.data?.message ?? "An Axios error occured"
+        );
+      }
+
+      const err = error as Error;
+      alert(err?.message ?? "An error occured");
+    }
+  };
   return (
     <div className="people group border border-heyhao-border p-6 rounded-3xl flex items-center justify-between relative overflow-hidden">
       <img
@@ -48,7 +71,12 @@ export default function PeopleCard({ data }: PeopleCardProps) {
           </div>
         </div>
       </div>
-      <a href="message-room-chat-people.html" className="shrink-0">
+      <button
+        disabled={isPending}
+        onClick={() => handleCreateRoom()}
+        type="button"
+        className="shrink-0 cursor-pointer"
+      >
         <div className="flex items-center gap-[2px] py-[14px] px-4 rounded-xl bg-[#165DFF17] backdrop-blur-sm">
           <img
             src="/assets/images/icons/messages-2-blue.svg"
@@ -59,7 +87,7 @@ export default function PeopleCard({ data }: PeopleCardProps) {
             Message
           </p>
         </div>
-      </a>
+      </button>
     </div>
   );
 }
