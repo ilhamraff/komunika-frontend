@@ -11,6 +11,9 @@ import { AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPaymentPage from "./features/transactions/pages/SuccessPaymentPage";
 import ChatPage from "./features/chat/pages/ChatPage";
+import SettingPage from "./features/setting/pages/SettingPage";
+import AccountPage from "./features/setting/pages/AccountPage";
+import GroupsPage from "./features/setting/pages/GroupsPage";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +88,32 @@ const router = createBrowserRouter([
       return auth;
     },
     element: <ChatPage />,
+  },
+  {
+    path: "/home/settings",
+    loader: () => {
+      const auth = secureLocalStorage.getItem(AUTH_KEY);
+
+      if (!auth) {
+        throw redirect("/sign-in");
+      }
+
+      return auth;
+    },
+    children: [
+      {
+        index: true,
+        element: <SettingPage />,
+      },
+      {
+        path: "/home/settings/account",
+        element: <AccountPage />,
+      },
+      {
+        path: "/home/settings/groups",
+        element: <GroupsPage />,
+      },
+    ],
   },
   {
     path: "/home",
