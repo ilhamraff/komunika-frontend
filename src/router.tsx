@@ -15,6 +15,19 @@ import SettingPage from "./features/setting/pages/SettingPage";
 import AccountPage from "./features/setting/pages/AccountPage";
 import GroupsPage from "./features/setting/pages/GroupsPage";
 import GroupDetailPage from "./features/setting/pages/GroupDetailPage";
+import CreateGroupPage from "./features/setting/pages/CreateGroupPage";
+
+const requireAuth = () => {
+  const auth = secureLocalStorage.getItem(AUTH_KEY);
+  if (!auth) throw redirect("/sign-in");
+  return auth;
+};
+
+const guestOnly = () => {
+  const auth = secureLocalStorage.getItem(AUTH_KEY);
+  if (auth) throw redirect("/home/discover");
+  return true;
+};
 
 const router = createBrowserRouter([
   {
@@ -23,54 +36,22 @@ const router = createBrowserRouter([
   },
   {
     path: "/sign-up",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-
-      return true;
-    },
+    loader: guestOnly,
     element: <SignUpPages />,
   },
   {
     path: "/sign-in",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-
-      return true;
-    },
+    loader: guestOnly,
     element: <SignInPages />,
   },
   {
     path: "/forgot-password",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-
-      return true;
-    },
+    loader: guestOnly,
     element: <ForgotPasswordPage />,
   },
   {
     path: "/reset-password/:token",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (auth) {
-        throw redirect("/home/discover");
-      }
-
-      return true;
-    },
+    loader: guestOnly,
     element: <UpdatePasswordPage />,
   },
   {
@@ -79,28 +60,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/home/chats",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (!auth) {
-        throw redirect("/sign-in");
-      }
-
-      return auth;
-    },
+    loader: requireAuth,
     element: <ChatPage />,
   },
   {
     path: "/home/settings",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (!auth) {
-        throw redirect("/sign-in");
-      }
-
-      return auth;
-    },
+    loader: requireAuth,
     children: [
       {
         index: true,
@@ -118,19 +83,15 @@ const router = createBrowserRouter([
         path: "/home/settings/groups/:id",
         element: <GroupDetailPage />,
       },
+      {
+        path: "/home/settings/create-group",
+        element: <CreateGroupPage />,
+      },
     ],
   },
   {
     path: "/home",
-    loader: () => {
-      const auth = secureLocalStorage.getItem(AUTH_KEY);
-
-      if (!auth) {
-        throw redirect("/sign-in");
-      }
-
-      return true;
-    },
+    loader: requireAuth,
     element: <LayoutPage />,
     children: [
       {

@@ -1,5 +1,5 @@
 import GroupCard from "../components/GroupCard";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { useDiscoverGroups } from "../hooks/useDiscoverGroups";
 import { useState } from "react";
 import SearchForm from "../components/SearchForm";
@@ -163,7 +163,7 @@ export default function DiscoverPage() {
               Discover And Explore 🚀 <br />A Community On{" "}
               <span className="text-heyhao-blue">HeyHao</span>.
             </h1>
-            <a href="create-new-group.html">
+            <Link to="/home/settings/create-group">
               <div className="flex items-center gap-1 py-[14px] px-[26px] rounded-full bg-heyhao-blue">
                 <p className="font-bold leading-[20px] text-white">
                   Create Group
@@ -174,7 +174,7 @@ export default function DiscoverPage() {
                   className="size-6 shrink-0"
                 />
               </div>
-            </a>
+            </Link>
           </header>
         )}
       </section>

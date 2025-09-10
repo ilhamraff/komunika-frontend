@@ -14,7 +14,7 @@ export default function GroupsPage() {
       >
         <div className="relative flex items-center justify-between w-full h-[112px] shrink-0 border-b border-heyhao-border bg-white p-[30px]">
           <h2 className="font-bold text-2xl leading-[30px]">My Own Groups</h2>
-          <Link to="/home/settings/groups/create">
+          <Link to="/home/settings/create-group">
             <div className="flex items-center gap-2 py-[14px] px-[32px] rounded-full bg-heyhao-blue">
               <p className="font-bold leading-[20px] text-white text-center">
                 Create New Group
