@@ -14,6 +14,7 @@ import ChatPage from "./features/chat/pages/ChatPage";
 import SettingPage from "./features/setting/pages/SettingPage";
 import AccountPage from "./features/setting/pages/AccountPage";
 import GroupsPage from "./features/setting/pages/GroupsPage";
+import GroupDetailPage from "./features/setting/pages/GroupDetailPage";
 
 const router = createBrowserRouter([
   {
@@ -112,6 +113,10 @@ const router = createBrowserRouter([
       {
         path: "/home/settings/groups",
         element: <GroupsPage />,
+      },
+      {
+        path: "/home/settings/groups/:id",
+        element: <GroupDetailPage />,
       },
     ],
   },

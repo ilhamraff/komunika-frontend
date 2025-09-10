@@ -1,7 +1,10 @@
 import { Link } from "react-router";
 import SiderbarMenu from "../components/SiderbarMenu";
+import { useGetGroups } from "../hooks/useGetGroups";
 
 export default function GroupsPage() {
+  const { data } = useGetGroups();
+
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
       <SiderbarMenu />
@@ -42,7 +45,7 @@ export default function GroupsPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    200.450
+                    {data?.totalMembers}
                   </strong>
                 </div>
                 <div className="card flex flex-col gap-2 p-6 bg-white rounded-2xl">
@@ -59,7 +62,7 @@ export default function GroupsPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    192
+                    {data?.paidGroups}
                   </strong>
                 </div>
                 <div className="card flex flex-col gap-2 p-6 bg-white rounded-2xl">
@@ -76,7 +79,7 @@ export default function GroupsPage() {
                     </h4>
                   </div>
                   <strong className="font-bold text-[32px] leading-[40px]">
-                    321
+                    {data?.freeGroups}
                   </strong>
                 </div>
               </section>
@@ -96,74 +99,82 @@ export default function GroupsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="flex items-center border-b border-heyhao-border mt-6 pb-6 mx-6">
-                      <td className="w-full min-w-[420px]">
-                        <div className="flex items-center gap-[12px]">
-                          <div className="flex justify-center items-center size-[64px] shrink-0 rounded-full overflow-hidden">
-                            <img
-                              src="/assets/images/thumbnails/featured-2.png"
-                              alt="image"
-                              className="size-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1 relative z-10">
-                            <h3 className="line-clamp-1 font-semibold text-lg leading-[22.5px]">
-                              Indonesia Laravel Creatives
-                            </h3>
-                            <div className="flex items-center gap-1">
+                    {data?.lists.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="flex items-center border-b border-heyhao-border mt-6 pb-6 mx-6"
+                      >
+                        <td className="w-full min-w-[420px]">
+                          <div className="flex items-center gap-[12px]">
+                            <div className="flex justify-center items-center size-[64px] shrink-0 rounded-full overflow-hidden">
                               <img
-                                src="/assets/images/icons/profile-2user-green.svg"
-                                alt="icon"
-                                className="size-4 shrink-0"
+                                src={item.photo_url}
+                                alt="image"
+                                className="size-full object-cover"
                               />
-                              <div className="flex gap-1">
-                                <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
-                                  22.259
-                                </p>
-                                <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
-                                  Members
-                                </p>
+                            </div>
+                            <div className="flex flex-col gap-1 relative z-10">
+                              <h3 className="line-clamp-1 font-semibold text-lg leading-[22.5px]">
+                                {item.name}
+                              </h3>
+                              <div className="flex items-center gap-1">
+                                <img
+                                  src="/assets/images/icons/profile-2user-green.svg"
+                                  alt="icon"
+                                  className="size-4 shrink-0"
+                                />
+                                <div className="flex gap-1">
+                                  <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
+                                    {item.totalMembers}
+                                  </p>
+                                  <p className="font-semibold text-sm leading-[17.5px] text-heyhao-green">
+                                    Members
+                                  </p>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="group vip w-full min-w-[204px] pl-6">
-                        <div
-                          id="Vip"
-                          className="group-[&.vip]:flex group-[&.free]:hidden shrink-0 items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full !w-fit"
-                        >
-                          <img
-                            src="/assets/images/icons/crown-blue-fill.svg"
-                            alt="icon"
-                            className="size-4 shrink-0"
-                          />
-                          <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                            VIP
-                          </p>
-                        </div>
-                        <div
-                          id="Free"
-                          className="group-[&.vip]:hidden group-[&.free]:flex shrink-0 items-center gap-[2px] py-[6px] px-[15.5px] bg-heyhao-grey rounded-full !w-fit"
-                        >
-                          <p className="font-bold text-sm leading-[17.5px] text-heyhao-secondary">
-                            Free
-                          </p>
-                        </div>
-                      </td>
-                      <td className="w-full min-w-[130px] pl-[10px]">
-                        <Link
-                          to="/home/settings/groups/1234"
-                          className="flex w-fit"
-                        >
-                          <div className="px-[32px] py-4 bg-heyhao-black rounded-full !w-fit">
-                            <p className="text-white font-bold leading-5">
-                              Manage
-                            </p>
-                          </div>
-                        </Link>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="group vip w-full min-w-[204px] pl-6">
+                          {item.type === "PAID" ? (
+                            <div
+                              id="Vip"
+                              className="flex shrink-0 items-center gap-[2px] py-[6px] px-2 bg-[#165DFF17] rounded-full !w-fit"
+                            >
+                              <img
+                                src="/assets/images/icons/crown-blue-fill.svg"
+                                alt="icon"
+                                className="size-4 shrink-0"
+                              />
+                              <p className="font-bold text-sm leading-[17.5px] text-heyhao-blue">
+                                VIP
+                              </p>
+                            </div>
+                          ) : (
+                            <div
+                              id="Free"
+                              className="flex shrink-0 items-center gap-[2px] py-[6px] px-[15.5px] bg-heyhao-grey rounded-full !w-fit"
+                            >
+                              <p className="font-bold text-sm leading-[17.5px] text-heyhao-secondary">
+                                Free
+                              </p>
+                            </div>
+                          )}
+                        </td>
+                        <td className="w-full min-w-[130px] pl-[10px]">
+                          <Link
+                            to={`/home/settings/groups/${item.id}`}
+                            className="flex w-fit"
+                          >
+                            <div className="px-[32px] py-4 bg-heyhao-black rounded-full !w-fit">
+                              <p className="text-white font-bold leading-5">
+                                Manage
+                              </p>
+                            </div>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </section>
