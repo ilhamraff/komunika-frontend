@@ -16,6 +16,7 @@ import AccountPage from "./features/setting/pages/AccountPage";
 import GroupsPage from "./features/setting/pages/GroupsPage";
 import GroupDetailPage from "./features/setting/pages/GroupDetailPage";
 import CreateGroupPage from "./features/setting/pages/CreateGroupPage";
+import { getGroup } from "./features/setting/api/getGroup";
 
 const requireAuth = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -85,6 +86,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/home/settings/create-group",
+        element: <CreateGroupPage />,
+      },
+      {
+        path: "/home/settings/groups/edit/:id",
+        loader: async ({ params }) => {
+          const group = await getGroup(params?.id ?? "");
+
+          return group.data;
+        },
         element: <CreateGroupPage />,
       },
     ],

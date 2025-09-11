@@ -1,13 +1,20 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useLoaderData, useNavigate, useRevalidator } from "react-router";
 import Siderbar from "../../../shared/components/Siderbar";
 import { useFieldArray, useForm } from "react-hook-form";
-import { createGroupSchema, type CreateGroupValues } from "../utils/schema";
+import { updateGroupSchema, type CreateGroupValues } from "../utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useMemo, useRef } from "react";
 import { useCreateGroup } from "../hooks/useCreateGroup";
 import { AxiosError } from "axios";
+import { downloadAsset } from "../../../shared/utils/helper";
+import { useDeleteAsset } from "../hooks/useDeleteAsset";
+import { useUpdateGroup } from "../hooks/useUpdateGroup";
+import type { GroupResponseValues } from "../api/getGroup";
 
 export default function CreateGroupPage() {
+  const revalidator = useRevalidator();
+  const group = useLoaderData() as GroupResponseValues;
+
   const {
     register,
     handleSubmit,
@@ -16,7 +23,15 @@ export default function CreateGroupPage() {
     setValue,
     control,
   } = useForm<CreateGroupValues>({
-    resolver: zodResolver(createGroupSchema),
+    resolver: zodResolver(updateGroupSchema),
+    defaultValues: {
+      assets: [],
+      name: group?.name,
+      about: group?.about,
+      type: group?.type as "FREE" | "PAID" | undefined,
+      benefits: group?.benefit.map((val) => ({ benefit: val })) ?? [],
+      price: group?.price?.toString() ?? "0",
+    },
   });
 
   const inputPriceRef = useRef<HTMLInputElement>(null);
@@ -33,14 +48,42 @@ export default function CreateGroupPage() {
   const navigate = useNavigate();
 
   const { mutateAsync, isPending } = useCreateGroup();
+  const { mutateAsync: mutateUpdate, isPending: isPendingUpdate } =
+    useUpdateGroup(group?.id ?? "");
+  const { mutateAsync: mutateDelete } = useDeleteAsset();
+
+  const onDeleteHandler = async (id: string) => {
+    try {
+      const userConfirmed = confirm("Are you sure to delete this asset?");
+
+      if (userConfirmed) {
+        await mutateDelete({ id });
+
+        revalidator.revalidate();
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(
+          error?.response?.data?.message ?? "An Axios error occured"
+        );
+      }
+
+      const err = error as Error;
+      alert(err?.message ?? "An error occured");
+    }
+  };
 
   const thumbnailUrl = useMemo(() => {
     if (thumbnail) {
       return URL.createObjectURL(thumbnail);
     }
 
+    if (group) {
+      return group.photo_url;
+    }
+
     return "/assets/images/photos/group-default.svg";
-  }, [thumbnail]);
+  }, [thumbnail, group]);
 
   const {
     append: appendBenefit,
@@ -84,7 +127,11 @@ export default function CreateGroupPage() {
         }
       }
 
-      await mutateAsync(formData);
+      if (group) {
+        await mutateUpdate(formData);
+      } else {
+        await mutateAsync(formData);
+      }
 
       navigate("/home/settings/groups");
     } catch (error) {
@@ -169,7 +216,7 @@ export default function CreateGroupPage() {
           >
             <div className="relative flex flex-col w-full bg-white gap-3">
               <h1 className="font-bold text-2xl leading-[30px]">
-                Create A New Group
+                {group ? "Update Group" : "Create New Group"}
               </h1>
               <nav>
                 <ol className="flex items-center gap-1 leading-5 text-heyhao-secondary">
@@ -190,7 +237,7 @@ export default function CreateGroupPage() {
                   <li>/</li>
                   <li>
                     <span className="font-medium leading-5 text-heyhao-blue">
-                      Create Group
+                      {group ? "Update Group" : "Create New Group"}
                     </span>
                   </li>
                 </ol>
@@ -198,17 +245,32 @@ export default function CreateGroupPage() {
             </div>
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || isPendingUpdate}
               className="flex shrink-0 rounded-full items-center py-4 px-8 gap-2 bg-heyhao-blue cursor-pointer"
             >
-              <span className="font-bold leading-5 text-white text-nowrap">
-                {isPending ? "Loading..." : "Create New Group"}
-              </span>
-              <img
-                src="/assets/images/icons/checklist-white-fill.svg"
-                className="flex size-6 shrink-0"
-                alt="icon"
-              />
+              {isPending || isPendingUpdate ? (
+                <>
+                  <span className="font-bold leading-5 text-white text-nowrap">
+                    Loading...
+                  </span>
+                  <img
+                    src="/assets/images/icons/checklist-white-fill.svg"
+                    className="flex size-6 shrink-0"
+                    alt="icon"
+                  />
+                </>
+              ) : (
+                <>
+                  <span className="font-bold leading-5 text-white text-nowrap">
+                    {group ? "Update Group" : "Create New Group"}
+                  </span>
+                  <img
+                    src="/assets/images/icons/checklist-white-fill.svg"
+                    className="flex size-6 shrink-0"
+                    alt="icon"
+                  />
+                </>
+              )}
             </button>
           </div>
           <div id="Content" className="flex flex-1 overflow-y-scroll">
@@ -352,6 +414,7 @@ export default function CreateGroupPage() {
                           {...register("type")}
                           type="radio"
                           value="FREE"
+                          disabled={!!group}
                           className="flex size-6 shrink-0 cursor-pointer"
                         />
                       </label>
@@ -374,6 +437,7 @@ export default function CreateGroupPage() {
                           {...register("type")}
                           type="radio"
                           value="PAID"
+                          disabled={!!group}
                           className="flex size-6 shrink-0 cursor-pointer"
                         />
                       </label>
@@ -414,7 +478,7 @@ export default function CreateGroupPage() {
                         }}
                         autoComplete="off"
                         placeholder=""
-                        defaultValue="0"
+                        defaultValue={group?.price ?? "0"}
                         className="appearance-none outline-none w-full rounded-xl ring-1 ring-heyhao-border py-5 pr-[159px] pl-[110px] gap-4 text-heyhao-black placeholder:text-heyhao-secondary font-semibold focus:valid:ring-heyhao-blue transition-all duration-300 disabled:bg-white"
                       />
                       <div
@@ -554,6 +618,74 @@ export default function CreateGroupPage() {
                             {errors.assets?.[index].asset?.message?.toString()}
                           </p>
                         )}
+                      </React.Fragment>
+                    ))}
+                    {group?.GroupAsset.map((asset) => (
+                      <React.Fragment key={asset.id}>
+                        <button
+                          type="button"
+                          className="btn-upload-file group relative disabled:bg-white flex h-16 items-center rounded-xl border border-heyhao-border py-5 px-6 gap-4 transition-all duration-300"
+                        >
+                          <input
+                            type="file"
+                            name=""
+                            id=""
+                            disabled
+                            className="file-input absolute opacity-0"
+                          />
+                          <img
+                            src="/assets/images/icons/document-text-grey.svg"
+                            className="flex size-6 shrink-0 group-[.file-uploaded]:hidden"
+                            alt="icon"
+                          />
+                          <img
+                            src="/assets/images/icons/document-text-black.svg"
+                            className="hidden size-6 shrink-0 group-[.file-uploaded]:flex"
+                            alt="icon"
+                          />
+                          <div className="flex h-6 shrink-0 border border-heyhao-border"></div>
+                          <span className="file-name w-full max-w-[245px] text-left truncate font-semibold leading-5 text-heyhao-secondary group-[.file-uploaded]:text-heyhao-black">
+                            {asset.filename}
+                          </span>
+                          <div
+                            id="VIP-badge"
+                            className="flex shrink-0 gap-0.5 rounded-lg items-center py-[6px] px-2 bg-heyhao-grey group-enabled:hidden"
+                          >
+                            <img
+                              src="/assets/images/icons/crown-grey-fill.svg"
+                              className="flex size-4 shrink-0"
+                              alt="icon"
+                            />
+                            <p className="font-medium text-sm text-heyhao-secondary">
+                              VIP Featured
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4 group-disabled:hidden">
+                            <div
+                              onClick={() =>
+                                downloadAsset(asset.file_url, asset.filename)
+                              }
+                              className="import-btn cursor-pointer"
+                            >
+                              <img
+                                src="/assets/images/icons/import-blue.svg"
+                                className="flex size-6 shrink-0"
+                                alt="icon"
+                              />
+                            </div>
+                            <div className="flex h-6 shrink-0 border border-heyhao-border"></div>
+                            <div
+                              onClick={() => onDeleteHandler(asset.id)}
+                              className="delete-btn cursor-pointer"
+                            >
+                              <img
+                                src="/assets/images/icons/trash-red.svg"
+                                className="flex size-6 shrink-0"
+                                alt="icon"
+                              />
+                            </div>
+                          </div>
+                        </button>
                       </React.Fragment>
                     ))}
                   </div>

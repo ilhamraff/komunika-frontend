@@ -32,4 +32,9 @@ export const createGroupSchema = z.object({
     .optional(),
 });
 
+export const updateGroupSchema = createGroupSchema.partial({
+  thumbnail: true,
+});
+
 export type CreateGroupValues = z.infer<typeof createGroupSchema>;
+export type UpdateGroupValues = z.infer<typeof updateGroupSchema>;

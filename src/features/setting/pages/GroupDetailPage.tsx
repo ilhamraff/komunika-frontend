@@ -49,7 +49,7 @@ export default function GroupDetailPage() {
               </ol>
             </nav>
           </header>
-          <Link to="settings-my-own-group-manage-vip-edit.html">
+          <Link to={`/home/settings/groups/edit/${id}`}>
             <div className="flex items-center gap-2 py-[14px] px-[32px] rounded-full bg-heyhao-blue">
               <p className="font-bold leading-[20px] text-white">Edit Group</p>
               <img
