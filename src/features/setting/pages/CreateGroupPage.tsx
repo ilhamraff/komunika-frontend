@@ -1,9 +1,11 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Siderbar from "../../../shared/components/Siderbar";
 import { useFieldArray, useForm } from "react-hook-form";
 import { createGroupSchema, type CreateGroupValues } from "../utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useMemo, useRef } from "react";
+import { useCreateGroup } from "../hooks/useCreateGroup";
+import { AxiosError } from "axios";
 
 export default function CreateGroupPage() {
   const {
@@ -27,6 +29,10 @@ export default function CreateGroupPage() {
   const type = watch("type");
   const assets = watch("assets");
   const thumbnail = watch("thumbnail");
+
+  const navigate = useNavigate();
+
+  const { mutateAsync, isPending } = useCreateGroup();
 
   const thumbnailUrl = useMemo(() => {
     if (thumbnail) {
@@ -56,6 +62,41 @@ export default function CreateGroupPage() {
 
   const onSubmit = async (data: CreateGroupValues) => {
     console.log(data);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("name", data.name);
+      formData.append("type", data.type === "FREE" ? "free" : "paid");
+      formData.append("about", data.about);
+      formData.append("price", data?.price ?? "0");
+      formData.append("photo", data.thumbnail);
+
+      if (data.benefits) {
+        for (let i = 0; i < (data.benefits ?? []).length; i++) {
+          formData.append(`benefit[${i}]`, data?.benefits[i].benefit);
+        }
+      }
+
+      if (data.assets) {
+        for (let i = 0; i < (data.assets ?? []).length; i++) {
+          formData.append(`assets`, data?.assets[i].asset);
+        }
+      }
+
+      await mutateAsync(formData);
+
+      navigate("/home/settings/groups");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(
+          error?.response?.data?.message ?? "An Axios error occured"
+        );
+      }
+
+      const err = error as Error;
+      alert(err?.message ?? "An error occured");
+    }
   };
 
   const toggleForm = () => {
@@ -157,10 +198,11 @@ export default function CreateGroupPage() {
             </div>
             <button
               type="submit"
+              disabled={isPending}
               className="flex shrink-0 rounded-full items-center py-4 px-8 gap-2 bg-heyhao-blue cursor-pointer"
             >
               <span className="font-bold leading-5 text-white text-nowrap">
-                Create New Group
+                {isPending ? "Loading..." : "Create New Group"}
               </span>
               <img
                 src="/assets/images/icons/checklist-white-fill.svg"
