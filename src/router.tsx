@@ -17,6 +17,7 @@ import GroupsPage from "./features/setting/pages/GroupsPage";
 import GroupDetailPage from "./features/setting/pages/GroupDetailPage";
 import CreateGroupPage from "./features/setting/pages/CreateGroupPage";
 import { getGroup } from "./features/setting/api/getGroup";
+import RevenuePage from "./features/revenue/pages/RevenuePage";
 
 const requireAuth = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -96,6 +97,16 @@ const router = createBrowserRouter([
           return group.data;
         },
         element: <CreateGroupPage />,
+      },
+    ],
+  },
+  {
+    path: "/home/revenue",
+    loader: requireAuth,
+    children: [
+      {
+        index: true,
+        element: <RevenuePage />,
       },
     ],
   },
