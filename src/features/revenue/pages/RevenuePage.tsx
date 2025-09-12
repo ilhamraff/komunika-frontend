@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { formatDate, formatRupiah } from "../../../shared/utils/helper";
 import ChartRevenue from "../components/ChartRevenue";
 import SidebarMenu from "../components/SidebarMenu";
@@ -54,12 +55,12 @@ export default function RevenuePage() {
                         </button>
                       </div>
                     </div>
-                    <a
-                      href="withdraw-money.html"
+                    <Link
+                      to="/home/revenue/withdraw"
                       className="rounded-full bg-heyhao-blue flex items-center justify-center gap-[10px] py-4 text-white w-full font-bold leading-[20px] text-center"
                     >
                       <p>Withdraw Money</p>
-                    </a>
+                    </Link>
                   </div>
                   <div className="flex items-center gap-3 p-6 border-t border-heyhao-border">
                     <img
