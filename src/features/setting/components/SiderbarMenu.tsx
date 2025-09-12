@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import Siderbar from "../../../shared/components/Siderbar";
 
 export default function SiderbarMenu() {
@@ -36,7 +36,13 @@ export default function SiderbarMenu() {
           <div className="flex flex-col gap-4">
             <h3 className="font-medium leading-5">Main Menu</h3>
             <div className="flex flex-col gap-1">
-              <Link to="/home/settings" className="group active">
+              <NavLink
+                to="/home/settings"
+                end
+                className={({ isActive }) =>
+                  `group ${isActive ? "active" : ""}`
+                }
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/setting-2.svg"
@@ -52,8 +58,13 @@ export default function SiderbarMenu() {
                     General Settings
                   </p>
                 </div>
-              </Link>
-              <Link to="/home/settings/account" className="group">
+              </NavLink>
+              <NavLink
+                to="/home/settings/account"
+                className={({ isActive }) =>
+                  `group ${isActive ? "active" : ""}`
+                }
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/user-square-nonactive.svg"
@@ -69,8 +80,13 @@ export default function SiderbarMenu() {
                     My Account
                   </p>
                 </div>
-              </Link>
-              <Link to="/home/settings/groups" className="group">
+              </NavLink>
+              <NavLink
+                to="/home/settings/groups"
+                className={({ isActive }) =>
+                  `group ${isActive ? "active" : ""}`
+                }
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/crown-grey.svg"
@@ -86,7 +102,7 @@ export default function SiderbarMenu() {
                     My Own Groups
                   </p>
                 </div>
-              </Link>
+              </NavLink>
               <Link to="#" className="group">
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
