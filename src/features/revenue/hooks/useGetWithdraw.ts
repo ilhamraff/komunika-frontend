@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBalance } from "../api/getBalance";
+import { getWithdraw } from "../api/getWithdraw";
 
-export const useGetBalance = () => {
+export const useGetWithdraw = () => {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["balance-number"],
-    queryFn: () => getBalance(),
+    queryKey: ["withdraw-history"],
+    queryFn: () => getWithdraw(),
     select: (data) => data.data,
   });
 

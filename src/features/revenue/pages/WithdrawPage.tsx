@@ -145,7 +145,6 @@ export default function WithdrawPage() {
                           Select your bank
                         </option>
                         <option value="BCA">BCA</option>
-                        <option value="BNI">BNI</option>
                         <option value="BRI">BRI</option>
                         <option value="Mandiri">Mandiri</option>
                       </select>

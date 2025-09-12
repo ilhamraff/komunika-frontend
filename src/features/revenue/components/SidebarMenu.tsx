@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import Siderbar from "../../../shared/components/Siderbar";
 
 export default function SidebarMenu() {
@@ -36,7 +36,13 @@ export default function SidebarMenu() {
           <div className="flex flex-col gap-4 p-6">
             <p className="font-medium">Main Menu</p>
             <div className="flex flex-col gap-1">
-              <Link to="my-revenue.html" className="group active">
+              <NavLink
+                to="/home/revenue"
+                end
+                className={({ isActive }) =>
+                  `group ${isActive ? "active" : ""}`
+                }
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/wallet-3-grey.svg"
@@ -52,8 +58,13 @@ export default function SidebarMenu() {
                     My Revenue Stat
                   </p>
                 </div>
-              </Link>
-              <Link to="history-payout.html" className="group">
+              </NavLink>
+              <NavLink
+                to="/home/revenue/payout"
+                className={({ isActive }) =>
+                  `group ${isActive ? "active" : ""}`
+                }
+              >
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
                     src="/assets/images/icons/note-grey.svg"
@@ -69,7 +80,7 @@ export default function SidebarMenu() {
                     History Payout
                   </p>
                 </div>
-              </Link>
+              </NavLink>
               <Link to="#" className="group">
                 <div className="flex items-center rounded-xl p-4 gap-2 bg-white group-[.active]:bg-heyhao-grey group-hover:bg-heyhao-grey transition-all duration-300">
                   <img
