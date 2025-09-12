@@ -1,7 +1,12 @@
+import { formatDate, formatRupiah } from "../../../shared/utils/helper";
 import ChartRevenue from "../components/ChartRevenue";
 import SidebarMenu from "../components/SidebarMenu";
+import { useGetRevenue } from "../hooks/useGetRevenue";
 
 export default function RevenuePage() {
+  const { data } = useGetRevenue();
+  console.log(data);
+
   return (
     <div className="flex h-screen max-h-screen flex-1 bg-heyhao-grey overflow-hidden">
       <SidebarMenu />
@@ -37,7 +42,7 @@ export default function RevenuePage() {
                       </div>
                       <div className="flex items-center gap-3 justify-between">
                         <p className="font-bold text-[32px] leading-10">
-                          Rp12.500.000
+                          {formatRupiah(data?.balance ?? 0)}
                         </p>
                         <button className="flex items-center gap-2 rounded-full p-2 pr-4 bg-heyhao-grey">
                           <img
@@ -79,7 +84,9 @@ export default function RevenuePage() {
                         VIP Groups
                       </p>
                     </div>
-                    <p className="font-bold text-[32px] leading-10">192</p>
+                    <p className="font-bold text-[32px] leading-10">
+                      {data?.totalVipGroups}
+                    </p>
                   </div>
                   <div className="flex flex-col rounded-2xl border border-heyhao-border p-6 gap-3 bg-white">
                     <div className="flex items-center gap-[6px]">
@@ -92,18 +99,23 @@ export default function RevenuePage() {
                         Total Member VIP
                       </p>
                     </div>
-                    <p className="font-bold text-[32px] leading-10">200.450</p>
+                    <p className="font-bold text-[32px] leading-10">
+                      {data?.totalVipMembers}
+                    </p>
                   </div>
                 </div>
               </div>
               {/* Chart Revenue */}
-              <ChartRevenue />
+              <ChartRevenue
+                values={data?.transactionsPerMonths ?? {}}
+                total={data?.totalRevenue ?? 0}
+              />
               {/* User History */}
               <div
                 id="Users"
                 className="flex flex-col gap-[30px] justify-center"
               >
-                <div className="flex flex-col rounded-3xl border border-heyhao-border bg-white">
+                {/* <div className="flex flex-col rounded-3xl border border-heyhao-border bg-white">
                   <div
                     id="Header-Row"
                     className="flex items-center gap-[30px] p-6"
@@ -129,7 +141,7 @@ export default function RevenuePage() {
                       haven’t shown up yet!
                     </p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex flex-col rounded-3xl border border-heyhao-border bg-white">
                   <div
                     id="Header-Row"
@@ -145,281 +157,66 @@ export default function RevenuePage() {
                       <p className="font-semibold">Status</p>
                     </div>
                   </div>
-                  <div className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border">
-                    <div className="flex items-center w-[250px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/photo-2.png"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col w-full gap-[6px]">
-                          <p className="font-semibold max-w-[187px] leading-5 truncate">
-                            Masayoshi
-                          </p>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
+                  {data?.latestMembersVip.map((member) => (
+                    <div
+                      key={member.id}
+                      className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border"
+                    >
+                      <div className="flex items-center w-[250px] shrink-0">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
                             <img
-                              src="/assets/images/icons/calendar-2.svg"
-                              className="flex size-4 shrink-0"
-                              alt="icon"
+                              src={member.User.photo_url}
+                              className="w-full h-full object-cover"
+                              alt="photo"
                             />
-                            Joined: 29 May 2024
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[348px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/laravel.svg"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-[6px] w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <p className="font-semibold max-w-[237px] leading-5 truncate">
-                              Indonesia Laravel Creatives
+                          </div>
+                          <div className="flex flex-col w-full gap-[6px]">
+                            <p className="font-semibold max-w-[187px] leading-5 truncate">
+                              {member.User.name}
                             </p>
-                            <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                              VIP
+                            <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
+                              <img
+                                src="/assets/images/icons/calendar-2.svg"
+                                className="flex size-4 shrink-0"
+                                alt="icon"
+                              />
+                              Joined: {formatDate(member.createdAt)}
                             </p>
                           </div>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-coral">
-                            Rp22.000.000
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center w-[130px] shrink-0">
-                      <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
-                        Success
-                      </p>
-                    </div>
-                  </div>
-                  <div className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border">
-                    <div className="flex items-center w-[250px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/photo-3.png"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col w-full gap-[6px]">
-                          <p className="font-semibold max-w-[187px] leading-5 truncate">
-                            Masayoshi
-                          </p>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
+                      <div className="flex items-center w-[348px] shrink-0">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
                             <img
-                              src="/assets/images/icons/calendar-2.svg"
-                              className="flex size-4 shrink-0"
-                              alt="icon"
+                              src={member.group.photo_url}
+                              className="w-full h-full object-cover"
+                              alt="photo"
                             />
-                            Joined: 29 May 2024
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[348px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/bwa.svg"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-[6px] w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <p className="font-semibold max-w-[237px] leading-5 truncate">
-                              Laravel PHP Indonesia
-                            </p>
-                            <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                              VIP
+                          </div>
+                          <div className="flex flex-col gap-[6px] w-full">
+                            <div className="flex items-center gap-3 w-full">
+                              <p className="font-semibold max-w-[237px] leading-5 truncate">
+                                {member.group.name}
+                              </p>
+                              <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
+                                VIP
+                              </p>
+                            </div>
+                            <p className="flex items-center font-semibold text-sm text-heyhao-coral">
+                              {formatRupiah(member.price)}
                             </p>
                           </div>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-coral">
-                            Rp22.000.000
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center w-[130px] shrink-0">
-                      <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
-                        Success
-                      </p>
-                    </div>
-                  </div>
-                  <div className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border">
-                    <div className="flex items-center w-[250px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/photo-4.png"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col w-full gap-[6px]">
-                          <p className="font-semibold max-w-[187px] leading-5 truncate">
-                            Masayoshi
-                          </p>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
-                            <img
-                              src="/assets/images/icons/calendar-2.svg"
-                              className="flex size-4 shrink-0"
-                              alt="icon"
-                            />
-                            Joined: 29 May 2024
-                          </p>
-                        </div>
+                      <div className="flex items-center w-[130px] shrink-0">
+                        <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
+                          Success
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center w-[348px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/group-3.svg"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-[6px] w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <p className="font-semibold max-w-[237px] leading-5 truncate">
-                              Laravel PHP Indonesia
-                            </p>
-                            <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                              VIP
-                            </p>
-                          </div>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-coral">
-                            Rp22.000.000
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[130px] shrink-0">
-                      <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
-                        Success
-                      </p>
-                    </div>
-                  </div>
-                  <div className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border">
-                    <div className="flex items-center w-[250px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/photo-1.png"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col w-full gap-[6px]">
-                          <p className="font-semibold max-w-[187px] leading-5 truncate">
-                            Masayoshi
-                          </p>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
-                            <img
-                              src="/assets/images/icons/calendar-2.svg"
-                              className="flex size-4 shrink-0"
-                              alt="icon"
-                            />
-                            Joined: 29 May 2024
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[348px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/bwa.svg"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-[6px] w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <p className="font-semibold max-w-[237px] leading-5 truncate">
-                              Laravel PHP Indonesia
-                            </p>
-                            <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                              VIP
-                            </p>
-                          </div>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-coral">
-                            Rp22.000.000
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[130px] shrink-0">
-                      <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
-                        Success
-                      </p>
-                    </div>
-                  </div>
-                  <div className="user-row flex items-center gap-[30px] p-6 border-t border-heyhao-border">
-                    <div className="flex items-center w-[250px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/photo-2.png"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col w-full gap-[6px]">
-                          <p className="font-semibold max-w-[187px] leading-5 truncate">
-                            Masayoshi
-                          </p>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-secondary">
-                            <img
-                              src="/assets/images/icons/calendar-2.svg"
-                              className="flex size-4 shrink-0"
-                              alt="icon"
-                            />
-                            Joined: 29 May 2024
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[348px] shrink-0">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="flex size-[50px] shrink-0 rounded-full overflow-hidden">
-                          <img
-                            src="/assets/images/photos/group.svg"
-                            className="w-full h-full object-cover"
-                            alt="photo"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-[6px] w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <p className="font-semibold max-w-[237px] leading-5 truncate">
-                              Belajar Laravel Bersama Developer Lain
-                            </p>
-                            <p className="badge rounded-full w-fit py-0.5 px-2 bg-heyhao-blue/10 font-bold text-sm leading-[17.5px] text-heyhao-blue">
-                              VIP
-                            </p>
-                          </div>
-                          <p className="flex items-center font-semibold text-sm text-heyhao-coral">
-                            Rp22.000.000
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-[130px] shrink-0">
-                      <p className="rounded-[50px] py-4 px-6 bg-heyhao-green font-bold leading-5 text-white">
-                        Success
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
               <section id="Pagination" className="mx-auto mt-[14px]">

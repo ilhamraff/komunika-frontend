@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import { useMemo } from "react";
 import { Line } from "react-chartjs-2";
+import { formatRupiah } from "../../../shared/utils/helper";
 
 ChartJS.register(
   Tooltip,
@@ -26,20 +27,23 @@ ChartJS.register(
 type optionProps = ChartOptions<"line">;
 type dataProps = ChartData<"line">;
 
-export default function ChartRevenue() {
+type Props = {
+  values: Record<string, number>;
+  total: number;
+};
+
+export default function ChartRevenue({ values, total }: Props) {
   const data: dataProps = useMemo(
     () => ({
-      labels: ["Mar", "Jun", "Jul", "Aug", "Sep", "Nov", "Dec"],
+      labels: Object.keys(values),
       datasets: [
         {
           label: "Revenue",
-          data: [
-            4000000, 6000000, 5000000, 10250000, 8000000, 9000000, 10000000,
-          ],
+          data: Object.values(values),
         },
       ],
     }),
-    []
+    [values]
   );
 
   const options: optionProps = useMemo(
@@ -116,7 +120,9 @@ export default function ChartRevenue() {
             />
             <p className="font-medium text-heyhao-secondary">Total Revenue</p>
           </div>
-          <p className="font-bold text-[32px] leading-10">Rp320.500.000</p>
+          <p className="font-bold text-[32px] leading-10">
+            {formatRupiah(total)}
+          </p>
         </div>
         <button className="flex items-center rounded-3xl border-[1.5px] border-heyhao-border py-3 px-4 gap-1 bg-heyhao-blue/10">
           <img
