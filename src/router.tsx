@@ -7,7 +7,7 @@ import UpdatePasswordPage from "./features/auth/pages/UpdatePasswordPage";
 import LayoutPage from "./shared/components/LayoutPage";
 import DiscoverPage from "./features/discover/pages/DiscoverPage";
 import secureLocalStorage from "react-secure-storage";
-import { AUTH_KEY } from "./shared/utils/constant";
+import { AUTH_ADMIN_KEY, AUTH_KEY } from "./shared/utils/constant";
 import DetailGroupPage from "./features/discover/pages/DetailGroupPage";
 import SuccessPaymentPage from "./features/transactions/pages/SuccessPaymentPage";
 import ChatPage from "./features/chat/pages/ChatPage";
@@ -20,6 +20,8 @@ import { getGroup } from "./features/setting/api/getGroup";
 import RevenuePage from "./features/revenue/pages/RevenuePage";
 import WithdrawPage from "./features/revenue/pages/WithdrawPage";
 import HistoryWithdrawPage from "./features/revenue/pages/HistoryWithdrawPage";
+import LayoutAdmin from "./shared/components/LayoutAdmin";
+import AdminHistoryWithdrawPage from "./features/admin/pages/AdminHistoryWithdrawPage";
 
 const requireAuth = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -46,7 +48,7 @@ const router = createBrowserRouter([
   {
     path: "/sign-in",
     loader: guestOnly,
-    element: <SignInPages />,
+    element: <SignInPages isAdmin={false} />,
   },
   {
     path: "/forgot-password",
@@ -144,6 +146,29 @@ const router = createBrowserRouter([
       {
         path: "discover/group/:groupId",
         element: <DetailGroupPage />,
+      },
+    ],
+  },
+  {
+    path: "/admin/sign-in",
+    element: <SignInPages isAdmin />,
+  },
+  {
+    path: "/admin",
+    loader: async () => {
+      const auth = secureLocalStorage.getItem(AUTH_ADMIN_KEY);
+
+      if (!auth) {
+        throw redirect("/admin/sign-in");
+      }
+
+      return true;
+    },
+    element: <LayoutAdmin />,
+    children: [
+      {
+        index: true,
+        element: <AdminHistoryWithdrawPage />,
       },
     ],
   },

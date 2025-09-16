@@ -4,12 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, type SignInValues } from "../utils/schema";
 import { useSignIn } from "../hooks/useSignIn";
 import secureLocalStorage from "react-secure-storage";
-import { AUTH_KEY } from "../../../shared/utils/constant";
+import { AUTH_ADMIN_KEY, AUTH_KEY } from "../../../shared/utils/constant";
 import { Link } from "react-router";
 import { useMemo } from "react";
 import { AxiosError } from "axios";
 
-export default function SignInPages() {
+type Props = {
+  isAdmin: boolean;
+};
+
+export default function SignInPages({ isAdmin }: Props) {
   const {
     register,
     handleSubmit,
@@ -26,9 +30,15 @@ export default function SignInPages() {
     try {
       const response = await mutateAsync(data);
 
-      secureLocalStorage.setItem(AUTH_KEY, response.data);
+      if (isAdmin) {
+        secureLocalStorage.setItem(AUTH_ADMIN_KEY, response.data);
 
-      window.location.replace("/home/chats");
+        window.location.replace("/admin");
+      } else {
+        secureLocalStorage.setItem(AUTH_KEY, response.data);
+
+        window.location.replace("/home/chats");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -170,12 +180,14 @@ export default function SignInPages() {
                         Password
                       </label>
                     </div>
-                    <Link
-                      to="/forgot-password"
-                      className="hover:underline font-medium leading-[20px] text-heyhao-secondary text-end"
-                    >
-                      Forget My password
-                    </Link>
+                    {!isAdmin && (
+                      <Link
+                        to="/forgot-password"
+                        className="hover:underline font-medium leading-[20px] text-heyhao-secondary text-end"
+                      >
+                        Forget My password
+                      </Link>
+                    )}
                   </div>
                   {errors?.password && (
                     <p className="mt-2 text-sm text-red-500">
@@ -193,15 +205,17 @@ export default function SignInPages() {
               >
                 {isPending ? "Loading..." : "Sign In Now"}
               </button>
-              <p className="font-semibold leading-[20px] text-center">
-                Don’t Have One?{" "}
-                <Link
-                  to="/sign-up"
-                  className="text-heyhao-blue hover:underline"
-                >
-                  Create Account Now
-                </Link>
-              </p>
+              {!isAdmin && (
+                <p className="font-semibold leading-[20px] text-center">
+                  Don’t Have One?{" "}
+                  <Link
+                    to="/sign-up"
+                    className="text-heyhao-blue hover:underline"
+                  >
+                    Create Account Now
+                  </Link>
+                </p>
+              )}
             </section>
           </form>
         </section>
