@@ -22,6 +22,7 @@ import WithdrawPage from "./features/revenue/pages/WithdrawPage";
 import HistoryWithdrawPage from "./features/revenue/pages/HistoryWithdrawPage";
 import LayoutAdmin from "./shared/components/LayoutAdmin";
 import AdminHistoryWithdrawPage from "./features/admin/pages/AdminHistoryWithdrawPage";
+import ApprovalPage from "./features/admin/pages/ApprovalPage";
 
 const requireAuth = () => {
   const auth = secureLocalStorage.getItem(AUTH_KEY);
@@ -169,6 +170,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <AdminHistoryWithdrawPage />,
+      },
+      {
+        path: "/admin/approve/:id",
+        element: <ApprovalPage />,
       },
     ],
   },
