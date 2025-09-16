@@ -1,18 +1,7 @@
+import { LOGO_BANK, STATUS_COLOR } from "../../../shared/utils/constant";
 import { formatDate, formatRupiah } from "../../../shared/utils/helper";
 import SidebarMenu from "../components/SidebarMenu";
 import { useGetWithdraw } from "../hooks/useGetWithdraw";
-
-const LOGO_BANK: Record<string, string> = {
-  BCA: "bca",
-  BRI: "bri",
-  MANDIRI: "mandiri",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  PENDING: "bg-heyhao-yellow",
-  SUCCESS: "bg-heyhao-green",
-  FAILED: "bg-heyhao-coral",
-};
 
 export default function HistoryWithdrawPage() {
   const { data } = useGetWithdraw();

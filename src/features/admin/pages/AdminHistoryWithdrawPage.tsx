@@ -1,4 +1,13 @@
+import { Link } from "react-router";
+import { LOGO_BANK, STATUS_COLOR } from "../../../shared/utils/constant";
+import { formatDate, formatRupiah } from "../../../shared/utils/helper";
+import { useGetWithdraw } from "../hooks/useGetWithdraw";
+
 export default function AdminHistoryWithdrawPage() {
+  const { data } = useGetWithdraw();
+
+  console.log(data);
+
   return (
     <main id="Main-Content-Container" className="relative flex flex-1">
       <div className="flex flex-col flex-1">
@@ -38,7 +47,7 @@ export default function AdminHistoryWithdrawPage() {
                     <p className="font-semibold">Action</p>
                   </div>
                 </div>
-                {/* {data?.map((item) => (
+                {data?.map((item) => (
                   <div
                     key={item.id}
                     className="user-row flex items-center gap-6 p-6 border-t border-heyhao-border"
@@ -83,8 +92,18 @@ export default function AdminHistoryWithdrawPage() {
                         {item.status}
                       </p>
                     </div>
+                    {item.status !== "SUCCESS" && (
+                      <div className="flex items-center w-[130px] shrink-0">
+                        <Link
+                          to={`/admin/approve/${item.id}`}
+                          className="rounded-full font-medium py-4 px-6 bg-heyhao-blue transition-colors hover:bg-blue-700 text-white"
+                        >
+                          Approve
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                ))} */}
+                ))}
               </div>
             </div>
             <section id="Pagination" className="mx-auto mt-[14px]">
